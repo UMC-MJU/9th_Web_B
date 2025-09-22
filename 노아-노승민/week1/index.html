@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YONG TODO</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="todo">
+    <h1 class="todo__title">TODO</h1>
+
+    <div class="todo__form">
+      <input id="todoInput" type="text" placeholder="할 일 입력" class="todo__form-input"/>
+      <button id="addBtn" class="todo__form-btn todo__form-btn--add">할 일 추가</button>
+    </div>
+
+    <div class="todo__lists">
+      <div class="todo__list todo__list--todo">
+        <h2 class="todo__list-header">할 일</h2>
+        <div class="todo__list-items" id="todoList"></div>
+      </div>
+
+      <div class="todo__list todo__list--done">
+        <h2 class="todo__list-header">완료</h2>
+        <div class="todo__list-items" id="doneList"></div>
+      </div>
+    </div>
+  </div>
+  <script defer src="./dist/app.js"></script>
+</body>
+</html>
