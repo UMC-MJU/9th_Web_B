@@ -3,23 +3,23 @@ import type { TTodo } from '../types/todo';
 import type { FormEvent } from 'react'; 
 
 const Todo = () => {
-    const [todos, setTodos] = useState<TTodo[]>([]);
-    const [doneTodos, setDoneTodos] = useState<TTodo[]>([]);
+    const [todos, setTodos] = useState<TTodo[]>([]); 
+    const [doneTodos, setDoneTodos] = useState<TTodo[]>([]); 
     const [input, setInput] = useState<string>('');
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
-        e.preventDefault();
+        e.preventDefault(); 
         const text = input.trim();
 
         if (text) {
-            const newTodo = { id: Date.now(), text }; 
+            const newTodo = { id: Date.now(), text };
             setTodos(prevTodos => [...prevTodos, newTodo]);
             setInput('');
         }
     };
 
     const CompleteTodo = (todo: TTodo): void => {
-        setTodos(prevTodos => prevTodos.filter(t => t.id !== todo.id));
+        setTodos(prevTodos => prevTodos.filter(t => t.id !== todo.id)); 
         setDoneTodos(prevDoneTodos => [...prevDoneTodos, todo]);
     };
 
