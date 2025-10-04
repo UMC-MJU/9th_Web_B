@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>명지대학교</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://www.mju.ac.kr/sites/mjukr/images/sub01/hisbox10.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 1.5px;
+            user-select: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        nav {
+            margin: 2rem auto;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        nav a {
+            background-color: rgba(0, 0, 0, 0.4);
+            text-decoration: none;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        nav a.active {
+            background-color: #2e86c1;
+            box-shadow: 0 0 12px #2e86c1;
+        }
+
+        nav a span.arrow {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        main#app {
+            max-width: 720px;
+            margin: 0 auto 3rem;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 2rem 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+        }
+
+        main#app h2 {
+            font-weight: 800;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        main#app p {
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        main#app ul {
+            padding-left: 1.2rem;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+
+        main#app ul li {
+            margin-bottom: 0.7rem;
+        }
+
+        main#app img {
+            margin-top: 1.5rem;
+            width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.65);
+            color: #ccc;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 1rem;
+            user-select: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        명지대학교 MYONGJI UNIVERSITY
+    </header>
+
+    <nav>
+        <a href="/" data-link>사랑과 창조의 글로벌 리더 <span class="arrow">→</span></a>
+        <a href="/admissions" data-link>대학입시 홈페이지 <span class="arrow">→</span></a>
+        <a href="/university" data-link>대학홈페이지 <span class="arrow">→</span></a>
+        <a href="/portal" data-link>포털시스템 로그인 <span class="arrow">→</span></a>
+        <a href="/donation" data-link>발전기금 홈페이지 <span class="arrow">→</span></a>
+    </nav>
+
+    <main id="app">
+
+    </main>
+
+    <footer>
+        인문캠퍼스 : (03674) 서울특별시 서대문구 거북골로 34 (TEL : 1577-0020)<br>
+        자연캠퍼스 : (17058) 경기도 용인시 처인구 명지로 116 (TEL : 1577-0020)<br>
+        COPYRIGHTⓒ MYONGJI UNIV. ALL RIGHTS RESERVED.
+    </footer>
+
+    <script>
+        const routes = {
+            "/": () => `
+    <h2>사랑과 창조의 글로벌 리더</h2>
+    <p>
+    내실있는 교육과 탁월한 연구, 그리고 예수님의 참 사랑을 실천하는 봉사활동으로
+    세계속의 명지대학교를 건설하고 세계평화와 인류문화발전에 기여하는 성실하고
+    유능한 인재를 양성하기 위해 책임과 사명을 다 할 것입니다.
+    </p>
+`,
+            "/admissions": () => `
+    <h2>대학입시 홈페이지</h2>
+    <p>명지대학교 입학 관련 주요 정보와 공지사항을 확인하세요.</p>
+    <ul>
+        <li>입학 전형 안내</li>
+        <li>원서 접수 기간</li>
+        <li>입학 상담 및 문의</li>
+    </ul>
+`,
+            "/university": () => `
+    <h2>대학홈페이지</h2>
+    <p>명지대학교의 다양한 학부, 연구소, 캠퍼스 소식과 행사 일정을 확인할 수 있습니다.</p>
+`,
+            "/portal": () => `
+    <h2>포털시스템 로그인</h2>
+    <p>명지대학교 재학생 및 교직원을 위한 포털 시스템 로그인 페이지입니다.</p>
+`,
+            "/donation": () => `
+    <h2>발전기금 홈페이지</h2>
+    <p>명지대학교 발전기금 및 후원 관련 안내 페이지입니다.</p>
+`,
+        };
+
+        function notFound() {
+            return `
+    <h2>404 - 페이지를 찾을 수 없습니다</h2>
+    <p>요청하신 페이지가 존재하지 않습니다.</p>
+    `;
+        }
+
+        function render(pathname) {
+            const app = document.getElementById("app");
+            const routeFunc = routes[pathname];
+            app.innerHTML = routeFunc ? routeFunc() : notFound();
+
+            document.querySelectorAll('nav a[data-link]').forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === pathname);
+            });
+        }
+
+        function navigate(event) {
+            const link = event.target.closest('a[data-link]');
+            if (!link) return;
+
+            event.preventDefault();
+
+            const path = link.getAttribute('href');
+            history.pushState({}, '', path);
+            render(path);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let path = window.location.pathname;
+            const validPaths = ['/', '/admissions', '/university', '/portal', '/donation'];
+
+            if (!validPaths.includes(path)) {
+                history.replaceState({}, '', '/');
+                path = '/';
+            }
+
+            render(path);
+
+            document.body.addEventListener('click', navigate);
+
+            window.addEventListener('popstate', () => {
+                render(window.location.pathname);
+            });
+        });
+    </script>
+</body>
+</html>
