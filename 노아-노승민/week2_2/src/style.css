@@ -1,0 +1,169 @@
+body {
+  font-family: "Noto Sans KR", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+
+.todo {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 400px;
+}
+
+.todo__title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.todo__form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.todo__form-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.todo__form-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.todo__form-btn--add {
+  background: #28a745;
+}
+
+.todo__lists {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.todo__list {
+  flex: 1;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.todo__list-header {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.todo__item {
+  background: #fafafa;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.todo__btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.todo__btn--done {
+  background: #28a745;
+}
+
+.todo__btn--delete {
+  background: #dc3545;
+}
+
+
+.theme-toggle-btn {
+  display: block;
+  margin: 0 auto 20px auto;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #f9f9f9;
+  color: #333;
+  transition: all 0.25s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: #eee;
+}
+
+/* 다크 모드 버튼 */
+.todo.dark .theme-toggle-btn {
+  background: #3a3a3a;
+  border: 1px solid #555;
+  color: #f5f5f5;
+}
+
+.todo.dark .theme-toggle-btn:hover {
+  background: #4a4a4a;
+}
+
+
+/* 다크 모드 스타일 */
+
+.todo.dark {
+  background: #2e2e2e; 
+  color: #f1f1f1;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.todo.dark .todo__title {
+  color: #f1f1f1;
+}
+
+.todo.dark .todo__item {
+  background: #3a3a3a; 
+  border: 1px solid #444;
+}
+
+.todo.dark .todo__form-input {
+  background: #444;
+  border: 1px solid #555;
+  color: #eee;
+}
+
+.todo.dark .todo__form-input::placeholder {
+  color: #bbb;
+}
+
+
+.todo.dark .todo__btn--add {
+  background: #28a745;
+}
+
+.todo.dark .todo__btn--done {
+  background: #28a745;
+}
+
+.todo.dark .todo__btn--delete {
+  background: #dc3545;
+}
