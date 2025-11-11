@@ -5,16 +5,17 @@ import { QUERY_KEY } from "../../constants/keys";
 import type { Lp } from "../../types/lp";
 
 function useGetLpList({ cursor, search = "", order = "desc", limit }: PaginationDto) {
-    return useQuery<Lp[]>({
+    return useQuery({
         queryKey: [QUERY_KEY.lps, { search, order, cursor, limit }],
         queryFn: async () => {
             const res = await getLpList({ cursor, search, order, limit });
             const d: any = res;
             const list =
                 Array.isArray(d?.data) ? d.data :
-                    Array.isArray(d?.list) ? d.list :
-                        Array.isArray(d) ? d :
-                            [];
+                Array.isArray(d?.list) ? d.list :
+                Array.isArray(d) ? d :
+                [];
+            
             return list as Lp[];
         },
         staleTime: 1000 * 60 * 5,

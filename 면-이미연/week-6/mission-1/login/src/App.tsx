@@ -8,9 +8,10 @@ import { SignupPage } from './pages/SignupPage'
 import MyPage from './pages/MyPage'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedLayout from './layouts/ProtectedLayout'
-import  GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage'
+import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import LpDetailPage from './pages/LpDetailPage'
 
 
 const publicRoutes: RouteObject[] = [
@@ -23,7 +24,7 @@ const publicRoutes: RouteObject[] = [
             { path: "login", element: <LoginPage /> },
             { path: "signup", element: <SignupPage /> },
             { path: "v1/auth/google/callback", element: <GoogleLoginRedirectPage /> },
-
+            { path: "lp/:lpId", element: <LpDetailPage /> },
         ],
     }
 ];
@@ -37,9 +38,6 @@ const protectedRoutes: RouteObject[] = [
             {
                 path: "my",
                 element: <MyPage />,
-            },
-            {
-                path: "lp/:lpid",
             },
         ],
     },

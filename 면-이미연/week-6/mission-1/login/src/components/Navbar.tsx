@@ -1,88 +1,41 @@
-import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import { getMyInfo } from "../apis/auth";
-import type { ResponseMyInfoDto } from "../types/auth";
 import { useAuth } from "../context/AuthContext";
-
-const NAV_HEIGHT = 64;
+import { useState } from "react";
+import Sidebar from "./Sidebar";
 
 const Navbar = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [profile, setProfile] = useState<ResponseMyInfoDto | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-
     const navigate = useNavigate();
-    const { accessToken, logout } = useAuth();
+    const { accessToken, nickname, logout } = useAuth(); 
+    const [isSidebarOpen, setSidebarOpen] = useState(true);
 
-    const toggleSidebar = () => setIsSidebarOpen((v) => !v);
-    const closeSidebar = () => setIsSidebarOpen(false);
+    const isLoggedIn = Boolean(accessToken);
 
-    useEffect(() => {
-        let ignore = false;
-        const fetchMe = async () => {
-            if (!accessToken) {
-                setProfile(null);
-                return;
-            }
-            try {
-                setIsLoading(true);
-                const res = await getMyInfo();
-                if (!ignore) setProfile(res);
-            } catch (err) {
-                try {
-                    await logout();
-                } finally {
-                    navigate("/");
-                }
-            } finally {
-                if (!ignore) setIsLoading(false);
-            }
-        };
-        fetchMe();
-        return () => {
-            ignore = true;
-        };
-    }, [accessToken, logout, navigate]);
-
-    const displayName = useMemo(() => {
-        const data = profile?.data as any;
-        const nick = data?.nickname?.trim?.();
-        const name = data?.name?.trim?.();
-        const email: string | undefined = data?.email;
-        if (nick) return nick;
-        if (name) return name;
-        if (email && email.includes("@")) return email.split("@")[0];
-        return "사용자";
-    }, [profile]);
-
-    const onLogout = async () => {
+    const handleLogout = async () => {
         await logout();
-        navigate("/");
     };
 
     return (
         <>
-            <nav className="fixed top-0 left-0 w-full bg-[#0D1117] text-white shadow-md z-50">
-                <header className="flex items-center justify-between px-6 py-4 bg-gray-900">
+            <nav className="fixed top-0 left-0 w-full bg-[#141414] text-white shadow-md z-50">
+                <div className="flex justify-between items-center px-6 py-4">
                     {/* 왼쪽: 햄버거 + 로고 */}
                     <div className="flex items-center gap-3">
-                        {/* 햄버거 버튼 */}
                         <button
-                            onClick={toggleSidebar}
                             className="p-2 hover:bg-gray-800 rounded"
-                            aria-label="메뉴 열기/닫기"
-                            aria-expanded={isSidebarOpen}
-                            aria-controls="app-sidebar"
-                            type="button"
+                            onClick={() => setSidebarOpen((p) => !p)}
                         >
-                            <svg width="28" height="28" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <svg
+                                width="22"
+                                height="22"
+                                viewBox="0 0 48 48"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
                                 <path
                                     fill="none"
                                     stroke="currentColor"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeWidth="4"
+                                    strokeWidth="3"
                                     d="M7.95 11.95h32m-32 12h32m-32 12h32"
                                 />
                             </svg>
@@ -93,13 +46,13 @@ const Navbar = () => {
                         </Link>
                     </div>
 
-                    {/* 오른쪽: 로그인 / 회원가입 */}
-                    <div className="flex items-center gap-4">
+                    {/* 오른쪽: 검색 + 로그인/회원가입 */}
+                    <div className="flex items-center gap-4 text-sm">
+                        {/* 🔍 검색 버튼 */}
                         <button
                             onClick={() => navigate("/search")}
-                            className="p-2 hover:bg-gray-800 rounded"
-                            aria-label="검색으로 이동"
-                            type="button"
+                            className="p-2 hover:text-pink-400 transition"
+                            aria-label="검색"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -118,37 +71,37 @@ const Navbar = () => {
                             </svg>
                         </button>
 
-                        {accessToken ? (
+                        {isLoggedIn ? (
                             <>
-                                <span className="hidden sm:block text-sm md:text-base text-gray-300 min-w-24 text-right">
-                                    {isLoading ? "로딩중..." : `${displayName}님 반갑습니다.`}
+                                <span className="hidden sm:block text-gray-300">
+                                    {nickname || "사용자"}님 반갑습니다.
                                 </span>
                                 <button
-                                    onClick={onLogout}
-                                    className="text-white hover:text-pink-400 transition"
-                                    type="button"
+                                    onClick={handleLogout}
+                                    className="hover:text-pink-400 transition"
                                 >
                                     로그아웃
                                 </button>
                             </>
                         ) : (
                             <>
-                                <Link to="/login" className="text-white hover:text-pink-400 transition">
+                                <Link to="/login" className="hover:text-pink-400 transition">
                                     로그인
                                 </Link>
                                 <Link
                                     to="/signup"
-                                    className="bg-pink-500 text-white px-4 py-1.5 rounded-full font-medium hover:bg-pink-600 transition"
+                                    className="bg-pink-500 text-white px-4 py-1.5 rounded-md font-medium hover:bg-pink-600 transition"
                                 >
                                     회원가입
                                 </Link>
                             </>
                         )}
                     </div>
-                </header>
+                </div>
             </nav>
-            <div style={{ height: NAV_HEIGHT }} />
-            <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+
+            {/* Sidebar 항상 렌더링 */}
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
         </>
     );
 };

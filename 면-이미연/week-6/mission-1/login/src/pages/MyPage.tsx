@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getMyInfo } from "../apis/auth";
 import type { ResponseMyInfoDto } from "../types/auth";
 import { useAuth } from "../context/AuthContext";
@@ -27,17 +27,6 @@ const MyPage = () => {
         navigate("/");
     };
 
-    const displayName = useMemo(() => {
-        const d = data?.data;
-        const nick = (d as any)?.nickname?.trim?.() ?? "";
-        const name = d?.name?.trim?.() ?? "";
-        const email = d?.email ?? "";
-        if (nick) return nick;
-        if (name) return name;
-        if (email.includes("@")) return email.split("@")[0];
-        return "회원";
-    }, [data]);
-
     const avatarPath = data?.data?.avatar ?? null;
     const avatarUrl =
         typeof avatarPath === "string" && avatarPath.length > 0
@@ -63,7 +52,7 @@ const MyPage = () => {
 
     return (
         <section className="max-w-4xl mx-auto px-6 py-10">
-            <h1 className="text-3xl font-extrabold mb-6">{displayName}님, 반가워요.</h1>
+            <h1 className="text-3xl font-extrabold mb-6">회원님, 반가워요.</h1>
 
             <div className="flex items-center gap-6">
                 {avatarUrl ? (

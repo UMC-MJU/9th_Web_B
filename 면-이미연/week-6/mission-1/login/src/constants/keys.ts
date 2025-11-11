@@ -1,6 +1,7 @@
 export const LOCAL_STORAGE_KEY = {
     accessToken: "accessToken",
     refreshToken: "refreshToken",
+    nickname: "nickname",
 } as const;
 
 export const QUERY_KEY = {

@@ -20,6 +20,7 @@ export type Author = {
 };
 
 export type Lp = {
+    data: LpDetail;
     id: number;
     title: string;
     content: string;
