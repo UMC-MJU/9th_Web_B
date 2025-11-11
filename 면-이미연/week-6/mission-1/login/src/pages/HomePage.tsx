@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import useGetLpList from "../hooks/queries/useGetLpList";
 import type { Lp } from "../types/lp";
 import LoadingSpinner from "../components/common/LoadingFallback";
@@ -6,10 +7,12 @@ import ErrorFallback from "../components/common/ErrorFallback";
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const [order, setOrder] = useState<"asc" | "desc">("desc");
+
     const { data: lps = [], isPending, isError, error } = useGetLpList({
         cursor: undefined,
         search: "",
-        order: "desc",
+        order,
         limit: 20,
     });
 
@@ -20,6 +23,29 @@ const HomePage = () => {
 
     return (
         <div className="max-w-7xl mx-auto py-8">
+            <div className="flex justify-end mb-4 space-x-2">
+                <button
+                    onClick={() => setOrder("desc")}
+                    className={`px-4 py-2 rounded ${
+                        order === "desc"
+                            ? "bg-white text-black"
+                            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    }`}
+                >
+                    최신순
+                </button>
+                <button
+                    onClick={() => setOrder("asc")}
+                    className={`px-4 py-2 rounded ${
+                        order === "asc"
+                            ? "bg-white text-black"
+                            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    }`}
+                >
+                    오래된순
+                </button>
+            </div>
+
             {isEmpty ? (
                 <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
                     <div className="text-center">
