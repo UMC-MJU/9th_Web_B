@@ -1,147 +1,114 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useGetLpList from "../hooks/queries/useGetLpList";
-import type { Lp } from "../types/lp";
-import LoadingSpinner from "../components/common/LoadingFallback";
-import ErrorFallback from "../components/common/ErrorFallback";
+import { PAGINATION_ORDER } from "../enums/common";
 
-const HomePage = () => {
+export default function LpListPage() {
+    const [order, setOrder] = useState<"newest" | "oldest">("newest");
     const navigate = useNavigate();
-    const [order, setOrder] = useState<"asc" | "desc">("desc");
 
-    const { data: lps = [], isPending, isError, error } = useGetLpList({
-        cursor: undefined,
+    const apiOrder =
+        order === "newest" ? PAGINATION_ORDER.DESC : PAGINATION_ORDER.ASC;
+
+    const {
+        data: lpList = [],
+        isPending,
+        isError,
+        refetch,
+    } = useGetLpList({
+        cursor: 0,
         search: "",
-        order,
+        order: apiOrder,
         limit: 20,
     });
 
-    if (isPending) return <LoadingSpinner />;
-    if (isError) return <ErrorFallback message={(error as any)?.message} />;
+    if (isPending) {
+        return (
+            <div className="p-5 grid grid-cols-3 md:grid-cols-4 gap-4">
+                {[...Array(12)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="aspect-square bg-gray-200 animate-pulse"
+                    ></div>
+                ))}
+            </div>
+        );
+    }
 
-    const isEmpty = lps.length === 0;
+    if (isError || lpList.length === 0) {
+        return (
+            <div className="p-5 text-center">
+                <p className="text-red-500 mb-2">LP 목록을 불러오지 못했습니다.</p>
+                <button
+                    onClick={() => refetch()}
+                    className="px-4 py-2 bg-pink-500 text-white rounded"
+                >
+                    다시 시도
+                </button>
+            </div>
+        );
+    }
 
     return (
-        <div className="max-w-7xl mx-auto py-8">
-            <div className="flex justify-end mb-4 space-x-2">
+        <div className="p-5">
+            {/* 정렬 버튼 */}
+            <div className="flex justify-end gap-3 mb-6">
                 <button
-                    onClick={() => setOrder("desc")}
-                    className={`px-4 py-2 rounded ${
-                        order === "desc"
-                            ? "bg-white text-black"
-                            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                    }`}
-                >
-                    최신순
-                </button>
-                <button
-                    onClick={() => setOrder("asc")}
-                    className={`px-4 py-2 rounded ${
-                        order === "asc"
-                            ? "bg-white text-black"
-                            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                    }`}
+                    onClick={() => setOrder("oldest")}
+                    className={`px-4 py-2 rounded ${order === "oldest"
+                            ? "bg-pink-600 text-white"
+                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        }`}
                 >
                     오래된순
                 </button>
+                <button
+                    onClick={() => setOrder("newest")}
+                    className={`px-4 py-2 rounded ${order === "newest"
+                            ? "bg-pink-600 text-white"
+                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        }`}
+                >
+                    최신순
+                </button>
             </div>
 
-            {isEmpty ? (
-                <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-                    <div className="text-center">
-                        <h2 className="text-2xl font-bold text-gray-300 mb-2">
-                            아직 게시물이 없습니다
-                        </h2>
-                    </div>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {lps.map((lp: Lp) => (
-                        <div
-                            key={lp.id}
-                            onClick={() => navigate(`/lp/${lp.id}`)}
-                            className="bg-gray-900 rounded-lg overflow-hidden cursor-pointer
-                                        transform transition-all duration-300 hover:scale-105 
-                                        hover:shadow-2xl hover:shadow-pink-500/50 group relative"
-                        >
-                            {/* 썸네일 */}
-                            <div className="relative h-48 overflow-hidden">
-                                {lp.thumbnail ? (
-                                    <img
-                                        src={
-                                            lp.thumbnail.startsWith("http")
-                                                ? lp.thumbnail
-                                                : `${import.meta.env.VITE_SERVER_API_URL}${lp.thumbnail}`
-                                        }
-                                        alt={lp.title}
-                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                        onError={(e) => {
-                                            (e.currentTarget as HTMLImageElement).src =
-                                                "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23374151'/><text x='50%' y='50%' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='14'>No Image</text></svg>";
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-500">
-                                        No Image
-                                    </div>
-                                )}
-
-                                {/* Hover 오버레이 */}
-                                <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 
-                                                transition-opacity duration-300 flex flex-col justify-end p-4">
-                                    <h3 className="text-white font-bold text-lg mb-1 line-clamp-2">
-                                        {lp.title}
-                                    </h3>
-                                    <div className="flex items-center justify-between text-sm text-gray-300">
-                                        <span>
-                                            {lp.createdAt
-                                                ? new Date(lp.createdAt).toLocaleDateString("ko-KR")
-                                                : "날짜 없음"}
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            ❤️ {lp.likes?.length ?? 0}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* 콘텐츠 */}
-                            <div className="p-4">
-                                <h3 className="text-lg font-bold mb-2 line-clamp-1">
-                                    {lp.title}
-                                </h3>
-                                <p className="text-gray-400 text-sm line-clamp-2 mb-3">
-                                    {lp.content}
+            {/* LP 카드 목록 */}
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {lpList.map((lp) => (
+                    <div
+                        key={lp.id}
+                        onClick={() => navigate(`/lp/${lp.id}`)}
+                        className="relative cursor-pointer overflow-hidden group"
+                    >
+                        <img
+                            src={lp.thumbnail}
+                            alt={lp.title}
+                            className="w-full h-full object-cover aspect-square transform transition-transform duration-500 group-hover:scale-105"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = "/fallback-image.png";
+                            }}
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end text-white text-left p-3">
+                            <h2 className="font-semibold text-base mb-1 truncate leading-snug">
+                                {lp.title}
+                            </h2>
+                            <div className="flex justify-between items-center text-xs mt-1">
+                                <p className="text-gray-300">
+                                    {new Date(lp.createdAt).toLocaleDateString("ko-KR", {
+                                        year: "numeric",
+                                        month: "2-digit",
+                                        day: "2-digit",
+                                    })}
                                 </p>
-
-                                {/* 작성자 & 좋아요 */}
-                                <div className="flex items-center justify-between text-xs text-gray-500">
-                                    {lp.author && <span>by {lp.author.name}</span>}
-                                    <span className="flex items-center gap-1">
-                                        ❤️ {lp.likes?.length ?? 0}
-                                    </span>
-                                </div>
-
-                                {/* 태그 */}
-                                {lp.tags && lp.tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 mt-3">
-                                        {lp.tags.slice(0, 3).map((tag) => (
-                                            <span
-                                                key={tag.id}
-                                                className="text-xs bg-gray-800 text-pink-400 px-2 py-1 rounded"
-                                            >
-                                                #{tag.name}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
+                                <p className="text-white font-medium">
+                                    ❤️ {lp.likes?.length || 0}
+                                </p>
                             </div>
                         </div>
-                    ))}
-                </div>
-            )}
+                    </div>
+                ))}
+            </div>
         </div>
     );
-};
-
-export default HomePage;
+}

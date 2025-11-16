@@ -20,24 +20,33 @@ export type Author = {
 };
 
 export type Lp = {
-    data: LpDetail;
     id: number;
     title: string;
     content: string;
     thumbnail: string;
     published: boolean;
     authorId: number;
-    createdAt: string;
-    updatedAt: string; 
+    createdAt: string; 
+    updatedAt: string;  
     tags: Tag[];
     likes: Like[];
     author?: Author;
 };
 
 export type LpDetail = Lp & {
-    author: Author; // 필수 author
+    author: Author;
 };
 
-export type ResponseLpListDto = CursorBasedResponse<{
-    data: Lp[];
-}>;
+export interface ResponseLpListDto {
+    status: boolean;
+    message: string;
+    statusCode: number;
+    data: CursorBasedResponse<Lp[]>;
+}
+
+export interface ResponseLpDetailDto {
+    status: boolean;
+    message: string;
+    statusCode: number;
+    data: Lp;
+}

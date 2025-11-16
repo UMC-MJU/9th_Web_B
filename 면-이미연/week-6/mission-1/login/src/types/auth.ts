@@ -1,46 +1,43 @@
-import type { CommonResponse } from "./common";
-
-// 회원가입
-export type RequestSignupDto = {
-    name: string;
-    email: string;
-    bio?: string;
-    avatar?: string;
-    password: string;
-};
-
-export type ResponseSignupDto = CommonResponse<{
-    id: number;
-    name: string;
-    email: string;
-    bio: string | null;
-    avatar: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-}>;
-
-// 로그인
-export type RequestSigninDto = {
+export interface RequestSigninDto {
     email: string;
     password: string;
-};
+}
 
-export type ResponseSigninDto = CommonResponse<{
-    id: number;
-    name: string;
-    accessToken: string;
-    refreshToken: string;
-    nickname: string | null;
-}>;
-
-// 내 정보 조회
-export type ResponseMyInfoDto = CommonResponse<{
-    nickname: any;
-    id: number;
-    name: string;
+export interface RequestSignupDto {
     email: string;
-    bio: string | null;
-    avatar: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-}>;
+    password: string;
+    name: string;
+    nickname?: string;
+}
+
+export interface BaseResponse {
+    status: boolean;
+    statusCode: number;
+    message: string;
+}
+
+export interface ResponseSigninDto extends BaseResponse {
+    data: {
+        accessToken: string;
+        refreshToken: string;
+    };
+}
+
+export interface ResponseMyInfoDto extends BaseResponse {
+    data: {
+        id: number;
+        email: string;
+        name: string;
+        nickname?: string;
+        avatar?: string | null;
+    };
+}
+
+export interface ResponseSignupDto extends BaseResponse {
+    data: {
+        id: number;
+        email: string;
+        name: string;
+        nickname?: string;
+    };
+}

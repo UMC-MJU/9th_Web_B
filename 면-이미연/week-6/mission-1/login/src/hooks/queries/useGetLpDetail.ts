@@ -1,16 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { getLpDetail } from "../../apis/lp";
 import { QUERY_KEY } from "../../constants/keys";
-import type { LpDetail } from "../../types/lp";
+import { getLpDetail } from "../../apis/lp";
+import type { Lp } from "../../types/lp";
 
 function useGetLpDetail(lpId: number) {
-    return useQuery({
+    return useQuery<Lp>({
         queryKey: [QUERY_KEY.lps, lpId],
-        queryFn: async () => {
-            const res = await getLpDetail(lpId);
-            
-            return res.data as LpDetail; 
-        },
+        queryFn: () => getLpDetail(lpId),
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 10,
         retry: 2,
