@@ -51,3 +51,46 @@ export const updateLp = async (id: number, formData: FormData): Promise<Lp> => {
     );
     return data.data;
 };
+
+/* 내가 생성한 LP 목록 조회 */
+export const getMyLpList = async (
+    paginationDto: PaginationDto
+): Promise<ResponseLpListDto> => {
+    const { data } = await axiosInstance.get<ResponseLpListDto>(
+        "/v1/lps/user",
+        {
+            params: paginationDto,
+        }
+    );
+
+    return data;
+};
+
+/* 내가 좋아요한 LP 목록 조회 */
+export const getMyLikedLpList = async (
+    paginationDto: PaginationDto
+): Promise<ResponseLpListDto> => {
+    const { data } = await axiosInstance.get<ResponseLpListDto>(
+        "/v1/lps/likes/me",
+        {
+            params: paginationDto,
+        }
+    );
+
+    return data;
+};
+
+/* 특정 유저가 좋아요한 LP 목록 */
+export const getUserLikedLpList = async (
+    userId: number,
+    paginationDto: PaginationDto
+): Promise<ResponseLpListDto> => {
+    const { data } = await axiosInstance.get<ResponseLpListDto>(
+        `/v1/lps/likes/${userId}`,
+        {
+            params: paginationDto,
+        }
+    );
+
+    return data;
+};

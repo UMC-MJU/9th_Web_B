@@ -8,8 +8,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEY } from "../constants/keys";
 import { postLp } from "../apis/lp";
 import { useGetMyInfo } from "../hooks/queries/useGetMyInfo";
+import useGetMyLpList from "../hooks/queries/useGetMyLpList";
+import useGetMyLikedLpList from "../hooks/queries/useGetMyLikedLpList";
+import type { PaginationDto } from "../types/common";
+import type { Lp } from "../types/lp";
 
-// 프로필 수정 모달
 interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,7 +22,6 @@ interface ProfileEditModalProps {
   avatarUrl: string;
 }
 
-// LP 생성 모달 props
 interface LpCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -52,7 +54,6 @@ const ProfileEditModal = ({
   const profileMutation = useMutation({
     mutationFn: (formData: FormData) => updateMyInfo(formData),
 
-    // 저장 누르자마자 화면에 반영
     onMutate: async (formData: FormData) => {
       await queryClient.cancelQueries({ queryKey: [QUERY_KEY.myInfo] });
 
@@ -82,7 +83,6 @@ const ProfileEditModal = ({
       return { previousMyInfo };
     },
 
-    // 실패하면 롤백
     onError: (_error, _variables, context) => {
       alert("프로필 수정에 실패했습니다.");
       if (context?.previousMyInfo) {
@@ -90,7 +90,6 @@ const ProfileEditModal = ({
       }
     },
 
-    // 끝나면 서버 데이터 다시 가져옴
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY.myInfo] });
       onClose();
@@ -204,7 +203,7 @@ const ProfileEditModal = ({
   );
 };
 
-// LP 생성 모달
+
 const LpCreateModal = ({ isOpen, onClose }: LpCreateModalProps) => {
   const queryClient = useQueryClient();
 
@@ -378,7 +377,7 @@ const LpCreateModal = ({ isOpen, onClose }: LpCreateModalProps) => {
   );
 };
 
-// 마이페이지 메인 컴포넌트
+
 const MyPage = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -387,6 +386,31 @@ const MyPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // 탭/정렬 상태
+  const [tab, setTab] = useState<"liked" | "created">("liked");
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
+
+  const basePagination: PaginationDto = {
+    cursor: 0,
+    limit: 20,
+    search: "",
+    order,
+  };
+
+  // 내가 작성한 LP / 좋아요한 LP 조회
+  const {
+    data: myLps = [],
+    isLoading: isMyLpsLoading,
+  } = useGetMyLpList(basePagination);
+
+  const {
+    data: likedLps = [],
+    isLoading: isLikedLpsLoading,
+  } = useGetMyLikedLpList(basePagination);
+
+  const currentLpList: Lp[] = tab === "liked" ? likedLps : myLps;
+  const isLpLoading = isMyLpsLoading || isLikedLpsLoading;
 
   const handleLogout = async () => {
     await logout();
@@ -422,47 +446,113 @@ const MyPage = () => {
 
   return (
     <>
-      <section className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="text-3xl font-extrabold mb-6">{name}님, 반가워요.</h1>
-
-        <div className="flex items-center gap-6">
+      {/* 상단 프로필 영역 */}
+      <section className="max-w-4xl mx-auto px-6 py-16 text-center">
+        <div className="flex flex-col items-center gap-4">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt="프로필 이미지"
-              className="w-20 h-20 rounded-full object-cover border border-gray-700"
+              className="w-32 h-32 rounded-full object-cover border border-gray-700"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src =
                   "data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'>\
-<circle cx='40' cy='40' r='40' fill='%236b7280'/></svg>";
+<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'>\
+<circle cx='64' cy='64' r='64' fill='%236b7280'/></svg>";
               }}
             />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-gray-700" />
+            <div className="w-32 h-32 rounded-full bg-gray-700" />
           )}
 
-          <div>
-            <p className="text-gray-300">{email}</p>
+          <h1 className="text-3xl font-extrabold">{name}</h1>
+          {bio && <p className="text-gray-300">{bio}</p>}
+          <p className="text-gray-400">{email}</p>
 
-            <div className="mt-3 flex gap-2">
-              <button
-                onClick={() => setIsProfileModalOpen(true)}
-                className="bg-gray-700 px-4 py-2 rounded-md text-white hover:brightness-110 cursor-pointer"
-              >
-                설정
-              </button>
-              <button
-                onClick={handleLogout}
-                className="bg-[#f72585] px-4 py-2 rounded-md text-white hover:brightness-90 cursor-pointer"
-              >
-                로그아웃
-              </button>
-            </div>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={() => setIsProfileModalOpen(true)}
+              className="bg-gray-700 px-4 py-2 rounded-md text-white hover:brightness-110 cursor-pointer"
+            >
+              설정
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-[#f72585] px-4 py-2 rounded-md text-white hover:brightness-90 cursor-pointer"
+            >
+              로그아웃
+            </button>
           </div>
         </div>
       </section>
 
+      {/* 탭 + 정렬 + LP 리스트 영역 */}
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        {/* 탭 메뉴 */}
+        <div className="flex justify-center space-x-10 text-lg">
+          <button
+            className={tab === "liked" ? "text-white" : "text-gray-500"}
+            onClick={() => setTab("liked")}
+          >
+            내가 좋아요 한 LP
+          </button>
+          <button
+            className={tab === "created" ? "text-white" : "text-gray-500"}
+            onClick={() => setTab("created")}
+          >
+            내가 작성한 LP
+          </button>
+        </div>
+
+        {/* 정렬 버튼 */}
+        <div className="flex justify-end mt-6">
+          <div className="flex rounded-lg overflow-hidden border border-gray-600">
+            <button
+              className={`px-4 py-2 ${order === "asc" ? "bg-white text-black" : "text-white"
+                }`}
+              onClick={() => setOrder("asc")}
+            >
+              오래된순
+            </button>
+            <button
+              className={`px-4 py-2 ${order === "desc" ? "bg-white text-black" : "text-white"
+                }`}
+              onClick={() => setOrder("desc")}
+            >
+              최신순
+            </button>
+          </div>
+        </div>
+
+        {/* LP 카드 리스트 */}
+        <div className="mt-10">
+          {isLpLoading ? (
+            <p className="text-center text-gray-500">LP를 불러오는 중...</p>
+          ) : currentLpList.length === 0 ? (
+            <p className="text-center text-gray-500">
+              아직 LP가 없습니다.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {currentLpList.map((lp) => (
+                <button
+                  key={lp.id}
+                  onClick={() => navigate(`/lps/${lp.id}`)}
+                  className="rounded-md overflow-hidden bg-gray-800 hover:bg-gray-700 transition"
+                >
+                  <img
+                    src={lp.thumbnail}
+                    alt={lp.title}
+                    className="w-full aspect-square object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 플로팅 + 버튼 */}
       <button
         onClick={() => setIsModalOpen(true)}
         className="fixed bottom-8 right-8 w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center text-white shadow-lg transition-transform hover:scale-105 z-40"
