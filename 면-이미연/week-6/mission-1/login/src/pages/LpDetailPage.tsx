@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postLike, deleteLike, deleteLp } from "../apis/lp";
 import { useGetMyInfo } from "../hooks/queries/useGetMyInfo";
 import { QUERY_KEY } from "../constants/keys";
+import LpCommentSection from "../components/lp/LpCommentSection";
 
 const LpDetailPage = () => {
     const { lpId } = useParams<{ lpId: string }>();
@@ -19,6 +20,32 @@ const LpDetailPage = () => {
 
     const { data: lp, isPending, isError, error } = useGetLpDetail(numericLpId);
     const { data: myInfo } = useGetMyInfo();
+
+    const likeMutation = useMutation({
+        mutationFn: ({ isLiked, lpId }: { isLiked: boolean; lpId: number }) =>
+            isLiked ? deleteLike(lpId) : postLike(lpId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEY.lps],
+            });
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEY.myLikedLps],
+            });
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (lpId: number) => deleteLp(lpId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEY.lps],
+            });
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEY.myLps],
+            });
+            navigate("/");
+        },
+    });
 
     if (isPending) return <LoadingSpinner />;
     if (isError)
@@ -35,40 +62,13 @@ const LpDetailPage = () => {
 
     const isLiked = !!lp.likes?.some((like) => like.userId === myUserId);
 
-    const likeMutation = useMutation({
-        mutationFn: () =>
-            isLiked ? deleteLike(lp.id) : postLike(lp.id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [QUERY_KEY.lps],
-            });
-            queryClient.invalidateQueries({
-                queryKey: [QUERY_KEY.myLikedLps],
-            });
-        },
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: () => deleteLp(lp.id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [QUERY_KEY.lps],
-            });
-            queryClient.invalidateQueries({
-                queryKey: [QUERY_KEY.myLps],
-            });
-            navigate("/");
-        },
-    });
-
-
     const handleEdit = () => {
         navigate(`/lp/${lpId}/edit`);
     };
 
     const handleDelete = async () => {
         if (window.confirm("정말 삭제하시겠습니까?")) {
-            deleteMutation.mutate();
+            deleteMutation.mutate(lp.id);
         }
     };
 
@@ -77,7 +77,7 @@ const LpDetailPage = () => {
             alert("로그인 후 이용 가능합니다.");
             return;
         }
-        likeMutation.mutate();
+        likeMutation.mutate({ isLiked, lpId: lp.id });
     };
 
     return (
@@ -129,23 +129,18 @@ const LpDetailPage = () => {
                         )}
                         <span>
                             {lp.createdAt
-                                ? new Date(lp.createdAt).toLocaleDateString(
-                                    "ko-KR",
-                                    {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    }
-                                )
+                                ? new Date(lp.createdAt).toLocaleDateString("ko-KR", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                })
                                 : "날짜 없음"}
                         </span>
                     </div>
 
                     <div className="flex items-center gap-1">
                         <Heart
-                            className={`w-5 h-5 ${isLiked
-                                    ? "fill-red-500 text-red-500"
-                                    : ""
+                            className={`w-5 h-5 ${isLiked ? "fill-red-500 text-red-500" : ""
                                 }`}
                         />
                         <span>{lp.likes?.length ?? 0}</span>
@@ -173,18 +168,13 @@ const LpDetailPage = () => {
                     onClick={handleLike}
                     disabled={likeMutation.isPending}
                     className={`flex items-center gap-2 px-4 py-2 rounded-md transition
-                              ${isLiked
+                            ${isLiked
                             ? "bg-red-500 hover:bg-red-600"
                             : "bg-gray-800 hover:bg-gray-700"
-                        } ${likeMutation.isPending
-                            ? "opacity-60 cursor-not-allowed"
-                            : ""
+                        } ${likeMutation.isPending ? "opacity-60 cursor-not-allowed" : ""
                         }`}
                 >
-                    <Heart
-                        className={`w-4 h-4 ${isLiked ? "fill-white" : ""
-                            }`}
-                    />
+                    <Heart className={`w-4 h-4 ${isLiked ? "fill-white" : ""}`} />
                     좋아요
                 </button>
 
@@ -206,7 +196,7 @@ const LpDetailPage = () => {
                         >
                             <Trash2 className="w-4 h-4" />
                             삭제
-                        </button>
+                        </button>T
                     </>
                 )}
             </div>
@@ -218,6 +208,8 @@ const LpDetailPage = () => {
                     dangerouslySetInnerHTML={{ __html: lp.content }}
                 />
             </div>
+
+            <LpCommentSection lpId={numericLpId} />
 
             {/* 뒤로가기 버튼 */}
             <div className="mt-12 pt-6 border-t border-gray-800">

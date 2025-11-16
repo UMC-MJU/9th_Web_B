@@ -22,3 +22,31 @@ export type PaginationDto = {
     search?: string;
     order?: PAGINATION_ORDER;
 };
+
+export type CommentAuthor = {
+    id: number;
+    name: string;
+    email: string;
+    bio: string | null;
+    avatar: string | null;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type Comment = {
+    id: number;
+    content: string;
+    lpId: number;
+    authorId: number;
+    createdAt: string;
+    updatedAt: string;
+    author: CommentAuthor | null;
+};
+
+export type CommentPage = {
+    data: Comment[];
+    nextCursor: number | null;
+    hasNext: boolean;
+};
+
+export type CommentListResponse = CommonResponse<CommentPage>;

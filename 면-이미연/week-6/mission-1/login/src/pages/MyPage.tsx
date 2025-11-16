@@ -537,7 +537,7 @@ const MyPage = () => {
               {currentLpList.map((lp) => (
                 <button
                   key={lp.id}
-                  onClick={() => navigate(`/lps/${lp.id}`)}
+                  onClick={() => navigate(`/lp/${lp.id}`)}
                   className="rounded-md overflow-hidden bg-gray-800 hover:bg-gray-700 transition"
                 >
                   <img

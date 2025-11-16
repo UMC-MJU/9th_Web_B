@@ -9,4 +9,5 @@ export const QUERY_KEY = {
     myInfo: "myInfo",
     myLps: "myLps",
     myLikedLps: "myLikedLps",
+    lpComments: "lpComments",
 } as const;

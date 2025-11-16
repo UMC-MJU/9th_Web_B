@@ -27,14 +27,22 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     return (
         <>
+            {isOpen && (
+                <div
+                    className="fixed inset-0 z-30 lg:hidden"
+                    onClick={onClose}
+                    aria-hidden="true"
+                />
+            )}
+
             <aside
                 className={`
-        fixed top-16 left-0 z-40 h-[calc(100vh-64px)] w-60
-        bg-[#111] text-gray-200 border-r border-gray-800
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:static lg:translate-x-0
-        flex flex-col
+            fixed top-16 left-0 z-40 h-[calc(100vh-64px)] w-60
+            bg-[#111] text-gray-200 border-r border-gray-800
+            transform transition-transform duration-300 ease-in-out
+            ${isOpen ? "translate-x-0" : "-translate-x-full"}
+            lg:static lg:translate-x-0
+            flex flex-col
         `}
             >
                 <nav className="flex-1 px-2 space-y-1 py-4">
@@ -42,7 +50,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         to="/search"
                         className={({ isActive }) =>
                             `flex items-center gap-2 rounded-md px-3 py-2 text-sm 
-            ${isActive ? "bg-[#1a1a1a] text-white" : "hover:bg-[#1a1a1a]"}`
+                ${isActive ? "bg-[#1a1a1a] text-white" : "hover:bg-[#1a1a1a]"}`
                         }
                         onClick={onClose}
                     >
@@ -53,7 +61,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         to="/my"
                         className={({ isActive }) =>
                             `flex items-center gap-2 rounded-md px-3 py-2 text-sm 
-            ${isActive ? "bg-[#1a1a1a] text-white" : "hover:bg-[#1a1a1a]"}`
+                ${isActive ? "bg-[#1a1a1a] text-white" : "hover:bg-[#1a1a1a]"}`
                         }
                         onClick={onClose}
                     >
@@ -89,11 +97,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <button
                                 onClick={handleConfirmWithdraw}
                                 disabled={isPending}
-                                className={`px-6 py-2 rounded font-bold text-black transition-colors ${
-                                    isPending
+                                className={`px-6 py-2 rounded font-bold text-black transition-colors ${isPending
                                         ? "bg-gray-300 cursor-not-allowed"
                                         : "bg-gray-200 hover:bg-white"
-                                }`}
+                                    }`}
                             >
                                 {isPending ? "처리 중..." : "예"}
                             </button>
